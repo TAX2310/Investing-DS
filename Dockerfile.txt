@@ -1,4 +1,0 @@
-FROM python:3.4-alpine
-ADD . /Invest_DS
-WORKDIR /Invest_DS
-RUN pip install -r requirments.txt
