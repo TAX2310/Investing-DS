@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Welcom Page</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    </head>
+    <body>
+        <script>
+            const api_url = "http://localhost:3000/api/AACG";
+  
+            // Defining async function
+            async function getapi(url) {
+                console.log('1')
+                // Storing response
+                const response = await fetch(url);
+                
+                // Storing data in form of JSON
+                var data = await response.json();
+                console.log(data);
+                if (response) {
+                    hideloader();
+                }
+                show(data);
+            }
+            // Calling that async function
+            getapi(api_url);
+        </script>
+        <canvas id="chart" width="400" height="400"></canvas>
+        <script>
+            const ctx = document.getElementById('chart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'scatter',
+                data: data,
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            </script>
+        <script src="" async defer></script>
+    </body>
+</html>
