@@ -4,8 +4,12 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.set('views',__dirname + '/views');
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
+
 app.get('/', (req, res) => {
-    res.sendFile('C:/Users/Taylor/Documents/Documents/Invest_DS/Invest_DS_Website_V.2/index.html')
+    res.render('index.ejs')
 });
 
 app.post('/collect_data', (req, res, next) => {
@@ -15,8 +19,12 @@ app.post('/collect_data', (req, res, next) => {
 
     fetch(api_url).then(res => res.json()).then(function(data) {
         returned = data;
-        console.log(returned);
-    });
+        // console.log(returned);
+
+        res.render('graph.ejs', {returned}) 
+        // console.log(res); 
+    }); 
+    
 });
 
 app.listen(3000,() => console.log('listening on port 3000'));

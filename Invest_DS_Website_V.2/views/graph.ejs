@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    </head>
+    <body>
+        hello world
+        <script> 
+            var data = JSON.parse('<%-JSON.stringify(returned)%>')
+            console.log(data)
+        </script>
+
+<canvas id="chart" width="400" height="400"></canvas>
+
+<script>
+    var len = data['data'].length;
+    console.log(len)
+    // graph_data = []
+    // // console.log(data['data'][0])
+    // for(var i = 0; i<len; i++){
+    //     // console.log(data['data'][i]['Date'])
+    //     // console.log(data['data'][i]['Close']);
+    //     graph_data.push(
+    //         {x: data['data'][i]['Open'],
+    //         y: data['data'][i]['Close']}
+    //     )
+    // }
+    
+    var labels = [];
+    var close_data = [];
+
+    for(var i = 0; i<len; i++){
+        labels[i] = data['data'][i]['Date'];
+        close_data[i] = data['data'][i]['Close'];
+    }
+
+
+
+    const graph_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Close',
+            data: close_data,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }],
+    };
+    // console.log(graph_data)
+    const ctx = document.getElementById('chart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: graph_data,
+    });
+
+
+    </script>
+
+    </body>
+</html>
