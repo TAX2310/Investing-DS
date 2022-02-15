@@ -7,60 +7,133 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
-    </head>
-    <body>
-        hello world
-        <script> 
-            var data = JSON.parse('<%-JSON.stringify(returned)%>')
-            console.log(data)
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.0/luxon.min.js" integrity="sha512-2j5fkjQ4q5ceXgfxi+kqrU2Oz234MrpyywZsQz1F5OGnfat7mOhjRr0oz5cpQ+YwwWB+hhDBSyxNGuL/tKWMFw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="scripts/chart.js/dist/chart.min.js"></script>
+        <script src="scripts/chartjs-adapter-luxon.min.js"></script>
+        <script src="scripts/hammerjs/hammer.min.js"></script>
+        <script src="scripts/chartjs-plugin-zoom/dist/chartjs-plugin-zoom.min.js"></script>
+        <script src="scripts/chartjs-chart-financial.js"></script>
+        <script>
+            function resize_canvas(){
+                canvas = document.getElementById("chart");
+                if (canvas.width  < window.innerWidth)
+                {
+                    canvas.width  = window.innerWidth;
+                }
+
+            }
+            
         </script>
+    </head>
+    <body onresize="resize_canvas()">
 
-<canvas id="chart" width="400" height="400"></canvas>
+        <h1> <%= ticker %> </h1>
 
-<script>
-    var len = data['data'].length;
-    console.log(len)
-    // graph_data = []
-    // // console.log(data['data'][0])
-    // for(var i = 0; i<len; i++){
-    //     // console.log(data['data'][i]['Date'])
-    //     // console.log(data['data'][i]['Close']);
-    //     graph_data.push(
-    //         {x: data['data'][i]['Open'],
-    //         y: data['data'][i]['Close']}
-    //     )
-    // }
-    
-    var labels = [];
-    var close_data = [];
+        <canvas id="chart" height = "100%"></canvas>
 
-    for(var i = 0; i<len; i++){
-        labels[i] = data['data'][i]['Date'];
-        close_data[i] = data['data'][i]['Close'];
-    }
+        <script>
+            var input_data = JSON.parse('<%-JSON.stringify(returned)%>');
+            var len = input_data['data'].length;
+            var close_data = [];
+            var moving_average = [];
+            var candlestick_data = [];
+            var upper_bollinger_bands = [];
+            var lower_bollinger_bands = [];
+                
+            for(var i = 0; i<len; i++){
+                var date = luxon.DateTime.fromISO( input_data['data'][i]['Date'])
+                
+                close_data[i] = { 
+                    x: date.valueOf(),
+                    y:  Math.round((input_data['data'][i]['Close'] + Number.EPSILON) * 100) / 100
+                };
 
+                moving_average[i] = { 
+                    x: date.valueOf(),
+                    y: Math.round((input_data['data'][i]['moving_average'] + Number.EPSILON) * 100) / 100
+                };
 
+                candlestick_data[i] = {
+                    x: date.valueOf(), 
+                    o: Math.round((input_data['data'][i]['Open'] + Number.EPSILON) * 100) / 100,
+                    h: Math.round((input_data['data'][i]['High'] + Number.EPSILON) * 100) / 100,
+                    l: Math.round((input_data['data'][i]['Low'] + Number.EPSILON) * 100) / 100,
+                    c: Math.round((input_data['data'][i]['Close'] + Number.EPSILON) * 100) / 100
+                };
 
-    const graph_data = {
-        labels: labels,
-        datasets: [{
-            label: 'Close',
-            data: close_data,
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }],
-    };
-    // console.log(graph_data)
-    const ctx = document.getElementById('chart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: graph_data,
-    });
+                upper_bollinger_bands[i] = { 
+                    x: date.valueOf(),
+                    y: Math.round((input_data['data'][i]['upper_band'] + Number.EPSILON) * 100) / 100
+                };
 
+                lower_bollinger_bands[i] = { 
+                    x: date.valueOf(),
+                    y: Math.round((input_data['data'][i]['lower_band'] + Number.EPSILON) * 100) / 100
+                };
+            };
 
-    </script>
+            const data = {
+                datasets: [{
+                    label: 'Candlestick',
+                    data: candlestick_data
+                },{
+                    label: 'Close',
+                    data: close_data,
+                    type: "line",
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },{
+                    label: 'Moving Average',
+                    data: moving_average,
+                    type: "line",
+                    fill: false,
+                    borderColor: 'rgb(197, 75, 192)',
+                    tension: 0.1
+                },{
+                    label: 'Upper Bollinger Bands',
+                    data: upper_bollinger_bands,
+                    type: "line",
+                    fill: false,
+                    borderColor: 'rgb(197, 192, 75)',
+                    tension: 0.1
+                },{
+                    label: 'Lower Bollinger Bands',
+                    data: lower_bollinger_bands,
+                    type: "line",
+                    fill: false,
+                    borderColor: 'rgb(197, 192, 75)',
+                    tension: 0.1
+                }]
+            }; 
+
+            const config = {
+                type: 'candlestick',
+                data,
+                options: {
+                    plugins: {
+                        zoom: {
+                            zoom: {
+                                wheel: {
+                                    enabled: true,
+                                },
+                                pinch: {
+                                    enabled: true
+                                },
+                                mode: 'xy',
+                            }
+                        }
+                    }
+                }
+            }
+
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            const myChart = new Chart(ctx, config);
+            // console.log(myChart)
+
+        </script>
 
     </body>
 </html>
+
