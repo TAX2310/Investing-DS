@@ -62,18 +62,18 @@ def add_bollinger_bands(df):
 def add_ichimoku(df):
     hi_val_1 = df['High'].rolling(window=9).max()
     low_val_1 = df['Low'].rolling(window=9).min()
-    df['tenkan-sen'] = hi_val_1 + low_val_1 / 2 
+    df['tenkan_sen'] = (hi_val_1 + low_val_1) / 2 
 
     hi_val_2 = df['High'].rolling(window=26).max()
     low_val_2 = df['Low'].rolling(window=26).min()
-    df['kijun-sen'] = hi_val_2 + low_val_2 / 2 
+    df['kijun_sen'] = (hi_val_2 + low_val_2) / 2 
 
-    df['senkou_span_a'] = ((df['tenkan-sen'] + df['kijun-sen']) / 2 ).shift(26)
+    df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2 ).shift(26)
 
     hi_val_3 = df['High'].rolling(window=52).max()
     low_val_3 = df['Low'].rolling(window=52).min()
-    df['senkou_span_b'] = ((df['tenkan-sen'] + df['kijun-sen']) / 2 ).rolling(window=52).mean()
+    df['senkou_span_b'] = ((hi_val_3 + low_val_3) / 2 ).shift(26)
 
-    df['Chikou_span'] = df['Close'].shift(-26)
+    df['chikou_span'] = df['Close'].shift(-26)
 
     return df

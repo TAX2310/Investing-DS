@@ -28,6 +28,4 @@ def api(ticker, period, moving):
 
     result = df.to_json(orient="table")
 
-    print(result)
-
     return result
