@@ -10,10 +10,60 @@
     </head>
     <body>
         <form method="POST" action="/collect_data">
+            <input type="text" id="myInput" onkeyup="search()" placeholder="Search..">
+        </form>
+        <form method="POST" action="/collect_data">
             Ticker: <input id="ticker" type="text" name="ticker" /><br>
             Period: <input id="period" type="text" name="period" /><br>
             Moving average: <input id="moving" type="number" name="moving" /><br>
             <input class="button" type="submit" value="OK" />
       </form>
     </body>
+    <script>
+        async function search() {
+            input = document.getElementById('myInput').value;
+            
+            api_url = "/searchbar?search=" + input
+            await fetch(api_url,).then(res => res.json()).then(function(data) {
+                console.log(data.data.items);
+                makeList(data.data.items);
+            });
+        };   
+
+        function makeList(listData) {
+            // Establish the array which acts as a data source for the list
+            var elem = document.getElementById("Div1");
+            console.log(elem)
+            if(elem != null){
+                elem.remove();
+            };
+            
+            // Make a container element for the list
+            let listContainer = document.createElement('mydiv'),
+            // Make the list
+            listElement = document.createElement('ul'),
+            // Set up a loop that goes through the items in listItems one at a time
+            numberOfListItems = listData.length,
+            listItem,
+            i;
+
+            listContainer.setAttribute("id", "Div1");
+
+            // Add it to the page
+            document.getElementsByTagName('body')[0].appendChild(listContainer);
+            listContainer.appendChild(listElement);
+
+            for (i = 0; i < numberOfListItems; ++i) {
+                // create an item for each one
+                listItem = document.createElement('li');
+
+                // Add the item text
+                listItem.innerHTML = listData[i]['symbol'] + "  -  " + listData[i]['name'];
+
+                // Add listItem to the listElement
+                listElement.appendChild(listItem);
+            }
+        }
+        
+    </script>
 </html>
